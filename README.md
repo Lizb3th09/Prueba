@@ -13,3 +13,8 @@
 <img width="430" height="464" alt="image" src="https://github.com/user-attachments/assets/ad0ab14e-4218-4699-9217-9801847b5906" />
 <img width="460" height="480" alt="image" src="https://github.com/user-attachments/assets/5566fcbe-18d2-4406-8ab7-fd675c6a5606" />
 <img width="452" height="478" alt="image" src="https://github.com/user-attachments/assets/2c9da12c-89c5-4d4e-98d4-bc77600f544a" />
+
+
+# Limite de Peticiones  ejemplo 10 por dia
+
+<img width="390" height="192" alt="image" src="https://github.com/user-attachments/assets/46db9b5c-0451-4c56-9cd4-6ff40e1b9243" />
