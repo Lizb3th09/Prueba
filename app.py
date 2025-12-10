@@ -1,28 +1,34 @@
-import math  # estándar
-import pandas as pd  # terceros
-from flask import Flask, request, jsonify, render_template  # terceros
+import math
+import pandas as pd
+from flask import Flask, request, jsonify, render_template
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 # CONFIG
 CSV_FILE = 'data/db-ens-RL(Hoja1).csv'
-
 LAT_MIN = 31.7
 LAT_MAX = 31.9
 LON_MIN = -116.8
 LON_MAX = -116.5
+LIMITE_DIARIO = "10 per day"
 
+# APP
 app = Flask(__name__)
-df_maestro = pd.DataFrame()
 
+# Limiter: se crea primero, luego se inicializa con app
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=[LIMITE_DIARIO]
+)
+limiter.init_app(app)
+
+df_maestro = pd.DataFrame()
 
 def load_master_dataframe():
     """Carga el CSV en el DataFrame maestro y limpia datos inválidos."""
     try:
         df = pd.read_csv(CSV_FILE, encoding='latin1')
-
-        # Limpiar coordenadas inválidas
         df = df[(df['latitud'].notna()) & (df['longitud'].notna())]
-
-        # Resetear índice
         df = df.reset_index(drop=True)
         print(f"✅ DataFrame cargado. Total de gimnasios: {len(df)}")
         print("Servidor corriendo en http://localhost:5000")
@@ -36,14 +42,14 @@ def load_master_dataframe():
 
 
 @app.route('/')
+@limiter.limit(LIMITE_DIARIO)
 def index():
-    """Renderiza la página principal."""
     return render_template('index.html')
 
 
 @app.route('/api/datos_negocios', methods=['GET'])
+@limiter.limit(LIMITE_DIARIO)
 def api_datos_negocios():
-    """Devuelve solo gimnasios dentro de Ensenada."""
     if df_maestro.empty:
         return jsonify({"error": "Datos no cargados"}), 500
 
@@ -63,8 +69,8 @@ def api_datos_negocios():
 
 
 @app.route('/excel/negocio/gimnasios', methods=['GET'])
+@limiter.limit(LIMITE_DIARIO)
 def obtener_gimnasios():
-    """Devuelve todos los gimnasios."""
     if df_maestro.empty:
         return jsonify({"error": "Datos no cargados"}), 500
 
@@ -76,8 +82,8 @@ def obtener_gimnasios():
 
 
 @app.route('/excel/negocio/ubicacion', methods=['GET'])
+@limiter.limit(LIMITE_DIARIO)
 def gimnasios_por_ubicacion():
-    """Cuenta gimnasios cercanos a una coordenada dada."""
     if df_maestro.empty:
         return jsonify({"error": "Datos no cargados"}), 500
 
@@ -104,8 +110,8 @@ def gimnasios_por_ubicacion():
 
 
 @app.route('/excel/negocio/contacto', methods=['GET'])
+@limiter.limit(LIMITE_DIARIO)
 def gimnasios_con_contacto():
-    """Filtra gimnasios por correo, teléfono o web."""
     if df_maestro.empty:
         return jsonify({"error": "Datos no cargados"}), 500
 
@@ -138,8 +144,8 @@ def gimnasios_con_contacto():
 
 
 @app.route('/excel/negocio/saturacion', methods=['GET'])
+@limiter.limit(LIMITE_DIARIO)
 def gimnasios_por_saturacion():
-    """Calcula saturación de gimnasios según proximidad."""
     if df_maestro.empty:
         return jsonify({"error": "Datos no cargados"}), 500
 
@@ -149,7 +155,6 @@ def gimnasios_por_saturacion():
         return jsonify({"error": "Parámetro radio inválido o faltante"}), 400
 
     def haversine(lat1, lon1, lat2, lon2):
-        """Calcula distancia Haversine entre dos coordenadas en km."""
         radio_tierra = 6371
         dlat = math.radians(lat2 - lat1)
         dlon = math.radians(lon2 - lon1)
@@ -183,8 +188,8 @@ def gimnasios_por_saturacion():
 
 
 @app.route('/api/filtro', methods=['GET'])
+@limiter.limit(LIMITE_DIARIO)
 def filtro_gimnasios():
-    """Filtra gimnasios por tipo: correo, telefono, web o saturación."""
     if df_maestro.empty:
         return jsonify({"error": "Datos no cargados"}), 500
 
@@ -216,7 +221,6 @@ def filtro_gimnasios():
     return jsonify(datos_respuesta.to_dict(orient='records')), 200
 
 
-# Correr programa
 if __name__ == '__main__':
     df_maestro = load_master_dataframe()
     app.run(debug=True)
