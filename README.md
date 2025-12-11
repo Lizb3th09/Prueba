@@ -1,3 +1,35 @@
+# ESTADISTICAS
+
+<img width="1812" height="505" alt="image" src="https://github.com/user-attachments/assets/67b94d7c-8f5c-4a36-b003-79d7304bb0c9" />
+<img width="1816" height="471" alt="image" src="https://github.com/user-attachments/assets/474debbd-486a-4867-a54a-61c5227c0629" />
+<img width="1810" height="457" alt="image" src="https://github.com/user-attachments/assets/3cf93320-c1ec-4925-996e-e87acfcf1ab5" />
+<img width="1787" height="445" alt="image" src="https://github.com/user-attachments/assets/e190b44d-bb56-4996-ab23-f951a99ed0a3" />
+
+
+
+# ENDPOINTS FUNCIONANO:
+
+saturacion:  http://localhost:5000/excel/negocio/saturacion?radio=0.5
+<img width="1581" height="791" alt="Captura de pantalla 2025-12-10 125127" src="https://github.com/user-attachments/assets/f1baa03f-bdba-41d7-8fe0-f8077d115fcf" />
+
+
+ubicación:  http://localhost:5000/excel/negocio/ubicacion?latitud=31.8&longitud=-116.7
+<img width="765" height="506" alt="Captura de pantalla 2025-12-10 124829" src="https://github.com/user-attachments/assets/16b82982-4b85-41e7-bca9-d9a82be159aa" />
+
+
+negocios: http://localhost:5000/api/datos_negocios
+<img width="849" height="743" alt="Captura de pantalla 2025-12-10 125019" src="https://github.com/user-attachments/assets/c3b096be-c47c-4e1b-9b3e-337276bbf5a7" />
+
+todos gimnasios:  http://localhost:5000/excel/negocio/gimnasios
+
+<img width="1283" height="966" alt="Captura de pantalla 2025-12-10 125251" src="https://github.com/user-attachments/assets/a1714595-7d69-4c78-be58-77e69b3ae9e3" />
+
+
+
+
+
+
+
 # Mapa Gimnasios de Ensenada
 
 <img width="1898" height="978" alt="image" src="https://github.com/user-attachments/assets/4d4955e8-fa01-4622-9321-d7ba80312126" />
