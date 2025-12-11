@@ -1,6 +1,8 @@
 import math
 import pandas as pd
 from flask import Flask, request, jsonify, render_template
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 # CONFIG
 CSV_FILE = 'Data/gym.csv'
@@ -13,16 +15,50 @@ LON_MAX = -116.5
 app = Flask(__name__)
 df_maestro = pd.DataFrame()
 
+# ---------------------- LIMITER ----------------------
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["20 per day"]  
+)
+limiter.init_app(app)
+
+# ---------------------- ERROR 429 PERSONALIZADO ----------------------
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    return """
+    <html>
+        <head>
+            <title>Límite alcanzado</title>
+            <style>
+                body {
+                    background-color: #fff;
+                    color: #333;
+                    font-family: Arial, sans-serif;
+                    text-align: center;
+                    padding-top: 20%;
+                }
+                .sad-face {
+                    font-size: 80px;
+                }
+                .message {
+                    font-size: 24px;
+                    margin-top: 20px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="sad-face">😢</div>
+            <div class="message">Ya no hay más peticiones disponibles por hoy</div>
+        </body>
+    </html>
+    """, 429
+
+# ---------------------- FUNCIONES ----------------------
 def load_master_dataframe():
     """Carga el CSV en el DataFrame maestro y limpia datos inválidos."""
     try:
-        # Convertimos todo a string para evitar errores de tipos mixtos
         df = pd.read_csv(CSV_FILE, encoding='utf-8', low_memory=False, dtype=str)
-
-        # Limpiar coordenadas inválidas
         df = df[(df['latitud'].notna()) & (df['longitud'].notna())]
-
-        # Resetear índice
         df = df.reset_index(drop=True)
         print(f"✅ DataFrame cargado. Total de gimnasios: {len(df)}")
         print("Servidor corriendo en http://localhost:5011")
@@ -35,15 +71,16 @@ def load_master_dataframe():
         return pd.DataFrame()
 
 # ---------------------- RUTAS ----------------------
-
 @app.route('/')
+@limiter.limit("20 per day")
 def index():
     return render_template('index.html')
 
 @app.route('/api/datos_negocios', methods=['GET'])
+@limiter.limit("20 per day")
 def api_datos_negocios():
     if df_maestro.empty:
-        return jsonify([]), 200  # Devuelve lista vacía
+        return jsonify([]), 200
     try:
         df_ensenada = df_maestro[
             (df_maestro['latitud'].astype(float) >= LAT_MIN) &
@@ -58,6 +95,7 @@ def api_datos_negocios():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/excel/negocio/gimnasios', methods=['GET'])
+@limiter.limit("20 per day")
 def obtener_gimnasios():
     if df_maestro.empty:
         return jsonify([]), 200
@@ -66,6 +104,7 @@ def obtener_gimnasios():
     return jsonify(datos_respuesta.to_dict(orient='records')), 200
 
 @app.route('/excel/negocio/ubicacion', methods=['GET'])
+@limiter.limit("20 per day")
 def gimnasios_por_ubicacion():
     if df_maestro.empty:
         return jsonify([]), 200
@@ -89,6 +128,7 @@ def gimnasios_por_ubicacion():
     }), 200
 
 @app.route('/excel/negocio/contacto', methods=['GET'])
+@limiter.limit("20 per day")
 def gimnasios_con_contacto():
     if df_maestro.empty:
         return jsonify([]), 200
@@ -107,6 +147,7 @@ def gimnasios_con_contacto():
     return jsonify(datos_respuesta.to_dict(orient='records')), 200
 
 @app.route('/excel/negocio/saturacion', methods=['GET'])
+@limiter.limit("20 per day")
 def gimnasios_por_saturacion():
     if df_maestro.empty:
         return jsonify([]), 200
@@ -114,28 +155,33 @@ def gimnasios_por_saturacion():
         radio = float(request.args.get('radio'))
     except (TypeError, ValueError):
         return jsonify({"error": "Parámetro radio inválido o faltante"}), 400
+
     def haversine(lat1, lon1, lat2, lon2):
         radio_tierra = 6371
         dlat = math.radians(lat2 - lat1)
         dlon = math.radians(lon2 - lon1)
-        a = math.sin(dlat / 2)**2 + math.cos(math.radians(lat1))*math.cos(math.radians(lat2))*math.sin(dlon/2)**2
-        c = 2*math.atan2(math.sqrt(a), math.sqrt(1-a))
+        a = math.sin(dlat / 2) ** 2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2) ** 2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
         return radio_tierra * c
+
     coords = df_maestro[['latitud', 'longitud']].astype(float).to_numpy()
     counts = [sum(haversine(lat1, lon1, lat2, lon2) <= radio for lat2, lon2 in coords) for lat1, lon1 in coords]
     df_maestro['gimnasios_cercanos'] = counts
     poco = df_maestro['gimnasios_cercanos'].quantile(0.25)
     mucho = df_maestro['gimnasios_cercanos'].quantile(0.75)
+
     def saturacion_label(x):
         if x <= poco: return 'poco'
         if x >= mucho: return 'mucho'
         return 'medio'
+
     df_maestro['saturacion'] = df_maestro['gimnasios_cercanos'].apply(saturacion_label)
     columnas_salida = ['nom_estab', 'latitud', 'longitud', 'telefono', 'correoelec', 'web', 'gimnasios_cercanos', 'saturacion']
     datos_respuesta = df_maestro[columnas_salida].where(pd.notnull(df_maestro[columnas_salida]), None)
     return jsonify(datos_respuesta.to_dict(orient='records')), 200
 
 @app.route('/api/filtro', methods=['GET'])
+@limiter.limit("20 per day")
 def filtro_gimnasios():
     if df_maestro.empty:
         return jsonify([]), 200
