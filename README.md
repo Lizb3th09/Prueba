@@ -18,10 +18,6 @@ todos gimnasios:  http://localhost:5000/excel/negocio/gimnasios
 
 
 
-
-
-
-
 # Mapa Gimnasios de Ensenada
 
 <img width="1898" height="978" alt="image" src="https://github.com/user-attachments/assets/4d4955e8-fa01-4622-9321-d7ba80312126" />
@@ -41,5 +37,5 @@ todos gimnasios:  http://localhost:5000/excel/negocio/gimnasios
 
 # Limite de Peticiones  
 ### ejemplo:  10 por dia
+<img width="1904" height="906" alt="image" src="https://github.com/user-attachments/assets/e4450c49-bbaa-4114-914d-923c059979d4" />
 
-<img width="390" height="192" alt="image" src="https://github.com/user-attachments/assets/46db9b5c-0451-4c56-9cd4-6ff40e1b9243" />
