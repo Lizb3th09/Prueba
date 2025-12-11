@@ -36,6 +36,6 @@ todos gimnasios:  http://localhost:5000/excel/negocio/gimnasios
 
 
 # Limite de Peticiones  
-### ejemplo:  10 por dia
+### ejemplo:  23 por dia
 <img width="1904" height="906" alt="image" src="https://github.com/user-attachments/assets/e4450c49-bbaa-4114-914d-923c059979d4" />
 
