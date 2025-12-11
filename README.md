@@ -1,11 +1,3 @@
-# ESTADISTICAS
-
-<img width="1812" height="505" alt="image" src="https://github.com/user-attachments/assets/67b94d7c-8f5c-4a36-b003-79d7304bb0c9" />
-<img width="1816" height="471" alt="image" src="https://github.com/user-attachments/assets/474debbd-486a-4867-a54a-61c5227c0629" />
-<img width="1810" height="457" alt="image" src="https://github.com/user-attachments/assets/3cf93320-c1ec-4925-996e-e87acfcf1ab5" />
-<img width="1787" height="445" alt="image" src="https://github.com/user-attachments/assets/e190b44d-bb56-4996-ab23-f951a99ed0a3" />
-
-
 
 # ENDPOINTS FUNCIONANO:
 
